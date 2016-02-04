@@ -7,7 +7,7 @@ module.exports = (grunt) ->
     sass:
       options:
         sourcemap: 'none'
-        
+
       default:
         files: [
           "dist/basic.css": "src/basic.scss"
@@ -37,6 +37,13 @@ module.exports = (grunt) ->
           "AMD_footer"
         ]
         dest: "dist/dropzone-amd-module.js"
+
+      exif:
+        src: [
+          "src/exif.js"
+          "dist/dropzone.js"
+        ]
+        dest: "dist/dropzone-exif.js"
 
     watch:
       js:

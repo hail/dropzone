@@ -1023,6 +1023,19 @@ class Dropzone extends Emitter
     img.crossOrigin = crossOrigin if crossOrigin
 
     img.onload = =>
+
+      orientation = 0
+      if EXIF
+        EXIF.getData img, ->
+          switch parseInt(EXIF.getTag(this, 'Orientation'))
+            when 3
+              orientation = 180
+            when 6
+              orientation = -90
+            when 8
+              orientation = 90
+          return
+
       file.width = img.width
       file.height = img.height
 
@@ -1037,7 +1050,7 @@ class Dropzone extends Emitter
       canvas.height = resizeInfo.trgHeight
 
       # This is a bugfix for iOS' scaling bug.
-      drawImageIOSFix ctx, img, resizeInfo.srcX ? 0, resizeInfo.srcY ? 0, resizeInfo.srcWidth, resizeInfo.srcHeight, resizeInfo.trgX ? 0, resizeInfo.trgY ? 0, resizeInfo.trgWidth, resizeInfo.trgHeight
+      drawImageIOSFix orientation, ctx, img, resizeInfo.srcX ? 0, resizeInfo.srcY ? 0, resizeInfo.srcWidth, resizeInfo.srcHeight, resizeInfo.trgX ? 0, resizeInfo.trgY ? 0, resizeInfo.trgWidth, resizeInfo.trgHeight
 
       thumbnail = canvas.toDataURL "image/png"
 
@@ -1519,6 +1532,13 @@ detectVerticalSquash = (img) ->
 # (args are for source and destination).
 drawImageIOSFix = (ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) ->
   vertSquashRatio = detectVerticalSquash img
+
+  dh = dh / vertSquashRatio
+  ctx.translate dx + dw / 2, dy + dh / 2
+  ctx.rotate -o * Math.PI / 180
+  dx = -dw / 2
+  dy = -dh / 2
+
   ctx.drawImage img, sx, sy, sw, sh, dx, dy, dw, dh / vertSquashRatio
 
 
