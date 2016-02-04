@@ -1025,7 +1025,7 @@ class Dropzone extends Emitter
     img.onload = =>
 
       orientation = 0
-      if EXIF
+      if typeof EXIF != 'undefined'
         EXIF.getData img, ->
           switch parseInt(EXIF.getTag(this, 'Orientation'))
             when 3

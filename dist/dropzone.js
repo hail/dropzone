@@ -1099,7 +1099,7 @@
         return function() {
           var canvas, ctx, orientation, resizeInfo, thumbnail, _ref, _ref1, _ref2, _ref3;
           orientation = 0;
-          if (EXIF) {
+          if (typeof EXIF !== 'undefined') {
             EXIF.getData(img, function() {
               switch (parseInt(EXIF.getTag(this, 'Orientation'))) {
                 case 3:
