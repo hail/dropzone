@@ -87,4 +87,4 @@ module.exports = (grunt) ->
 
   grunt.registerTask "js", "Compile coffeescript", [ "coffee", "concat" ]
 
-  grunt.registerTask "downloads", "Compile all stylus and coffeescript files and generate the download files", [ "js", "uglify" ]
+  grunt.registerTask "downloads", "Compile all stylus and coffeescript files and generate the download files", [ "js", "css", "uglify" ]

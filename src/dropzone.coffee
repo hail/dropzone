@@ -1530,7 +1530,7 @@ detectVerticalSquash = (img) ->
 
 # A replacement for context.drawImage
 # (args are for source and destination).
-drawImageIOSFix = (ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) ->
+drawImageIOSFix = (o, ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) ->
   vertSquashRatio = detectVerticalSquash img
 
   dh = dh / vertSquashRatio
