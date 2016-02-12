@@ -139,6 +139,7 @@ class Dropzone extends Emitter
     maxThumbnailFilesize: 10 # in MB. When the filename exceeds this limit, the thumbnail will not be generated.
     thumbnailWidth: 120
     thumbnailHeight: 120
+    dontFixScale: false
 
     # The base that is used to calculate the filesize. You can change this to
     # 1024 if you would rather display kibibytes, mebibytes, etc...
@@ -1050,7 +1051,10 @@ class Dropzone extends Emitter
       canvas.height = resizeInfo.trgHeight
 
       # This is a bugfix for iOS' scaling bug.
-      drawImageIOSFix orientation, ctx, img, resizeInfo.srcX ? 0, resizeInfo.srcY ? 0, resizeInfo.srcWidth, resizeInfo.srcHeight, resizeInfo.trgX ? 0, resizeInfo.trgY ? 0, resizeInfo.trgWidth, resizeInfo.trgHeight
+      if @options.dontFixScale
+        drawImageOrientation orientation, canvas, ctx, img, resizeInfo.srcX ? 0, resizeInfo.srcY ? 0, resizeInfo.srcWidth, resizeInfo.srcHeight, resizeInfo.trgX ? 0, resizeInfo.trgY ? 0, resizeInfo.trgWidth, resizeInfo.trgHeight
+      else
+        drawImageIOSFix orientation, ctx, img, resizeInfo.srcX ? 0, resizeInfo.srcY ? 0, resizeInfo.srcWidth, resizeInfo.srcHeight, resizeInfo.trgX ? 0, resizeInfo.trgY ? 0, resizeInfo.trgWidth, resizeInfo.trgHeight
 
       thumbnail = canvas.toDataURL "image/png"
 
@@ -1541,7 +1545,16 @@ drawImageIOSFix = (o, ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) ->
 
   ctx.drawImage img, sx, sy, sw, sh, dx, dy, dw, dh / vertSquashRatio
 
+drawImageOrientation = (o, canvas, ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) ->
+  if o == 90 || o == -90
+    canvas.width = dh
+    canvas.height = dw
 
+  ctx.translate canvas.width / 2, canvas.height / 2
+  ctx.rotate -o * Math.PI / 180
+  dx = -dw / 2
+  dy = -dh / 2
+  ctx.drawImage img, sx, sy, sw, sh, dx, dy, dw, dh;
 
 
 

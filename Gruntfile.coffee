@@ -81,10 +81,11 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks "grunt-contrib-uglify"
 
   # Default tasks
-  grunt.registerTask "default", [ "downloads" ]
+  grunt.registerTask "default", [ "downloadsnocss" ]
 
   grunt.registerTask "css", "Compile the sass files to css", [ "sass" ]
 
   grunt.registerTask "js", "Compile coffeescript", [ "coffee", "concat" ]
 
   grunt.registerTask "downloads", "Compile all stylus and coffeescript files and generate the download files", [ "js", "css", "uglify" ]
+  grunt.registerTask "downloadsnocss", "Compile all coffeescript files and generate the download files", [ "js", "uglify" ]

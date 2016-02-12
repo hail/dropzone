@@ -38,7 +38,7 @@
  */
 
 (function() {
-  var Dropzone, Emitter, camelize, contentLoaded, detectVerticalSquash, drawImageIOSFix, noop, without,
+  var Dropzone, Emitter, camelize, contentLoaded, detectVerticalSquash, drawImageIOSFix, drawImageOrientation, noop, without,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -137,6 +137,7 @@
       maxThumbnailFilesize: 10,
       thumbnailWidth: 120,
       thumbnailHeight: 120,
+      dontFixScale: false,
       filesizeBase: 1000,
       maxFiles: null,
       params: {},
@@ -1109,7 +1110,7 @@
       }
       img.onload = (function(_this) {
         return function() {
-          var canvas, ctx, orientation, resizeInfo, thumbnail, _ref, _ref1, _ref2, _ref3;
+          var canvas, ctx, orientation, resizeInfo, thumbnail, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7;
           orientation = 0;
           if (typeof EXIF !== 'undefined') {
             EXIF.getData(img, function() {
@@ -1138,7 +1139,11 @@
           ctx = canvas.getContext("2d");
           canvas.width = resizeInfo.trgWidth;
           canvas.height = resizeInfo.trgHeight;
-          drawImageIOSFix(orientation, ctx, img, (_ref = resizeInfo.srcX) != null ? _ref : 0, (_ref1 = resizeInfo.srcY) != null ? _ref1 : 0, resizeInfo.srcWidth, resizeInfo.srcHeight, (_ref2 = resizeInfo.trgX) != null ? _ref2 : 0, (_ref3 = resizeInfo.trgY) != null ? _ref3 : 0, resizeInfo.trgWidth, resizeInfo.trgHeight);
+          if (_this.options.dontFixScale) {
+            drawImageOrientation(orientation, canvas, ctx, img, (_ref = resizeInfo.srcX) != null ? _ref : 0, (_ref1 = resizeInfo.srcY) != null ? _ref1 : 0, resizeInfo.srcWidth, resizeInfo.srcHeight, (_ref2 = resizeInfo.trgX) != null ? _ref2 : 0, (_ref3 = resizeInfo.trgY) != null ? _ref3 : 0, resizeInfo.trgWidth, resizeInfo.trgHeight);
+          } else {
+            drawImageIOSFix(orientation, ctx, img, (_ref4 = resizeInfo.srcX) != null ? _ref4 : 0, (_ref5 = resizeInfo.srcY) != null ? _ref5 : 0, resizeInfo.srcWidth, resizeInfo.srcHeight, (_ref6 = resizeInfo.trgX) != null ? _ref6 : 0, (_ref7 = resizeInfo.trgY) != null ? _ref7 : 0, resizeInfo.trgWidth, resizeInfo.trgHeight);
+          }
           thumbnail = canvas.toDataURL("image/png");
           _this.emit("thumbnail", file, thumbnail);
           if (callback != null) {
@@ -1719,6 +1724,18 @@
     dx = -dw / 2;
     dy = -dh / 2;
     return ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh / vertSquashRatio);
+  };
+
+  drawImageOrientation = function(o, canvas, ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) {
+    if (o === 90 || o === -90) {
+      canvas.width = dh;
+      canvas.height = dw;
+    }
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(-o * Math.PI / 180);
+    dx = -dw / 2;
+    dy = -dh / 2;
+    return ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
   };
 
 
